@@ -39,4 +39,9 @@
 
 Soy un programador apasionado de Perú, con un amor por la vida y la tecnología. Desarrollo juegos para Android, como 'Navegador', y tengo varios proyectos interesantes en GitHub que puedes probar. También me especializo en la creación de bots para WhatsApp y otros proyectos innovadores. ¡Échales un vistazo! ^^
 
+𝚅𝚒𝚜𝚒𝚝𝚊𝚜 𝚍𝚎 𝙼𝚊𝚢𝚌𝚘𝚕𝙰𝙸:
+<div align="center">
+  <p><img src="https://profile-counter.glitch.me/{MaycolAI}/count.svg" alt="Contador de visitas" /></p>
+</div>
+
 <img width=100% src="https://capsule-render.vercel.app/api?type=waving&color=FF932E&height=120&section=footer"/>

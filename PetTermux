@@ -1,0 +1,171 @@
+mkdir -p ~/PetTermux
+cat <<'EOF' > ~/PetTermux/PetTermux.sh
+#!/data/data/com.termux/files/usr/bin/bash
+
+DATA="$HOME/PetTermux/petdata.txt"
+NAME_FILE="$HOME/PetTermux/name.txt"
+
+ascii_pet() {
+echo -e "\e[35m
+     (\_/)
+    ( •_•)
+  />💖<\\   Tu Mascota Virtual
+\e[0m"
+}
+
+load_data() {
+  [ ! -f "$DATA" ] && echo -e "\e[31mPrimero ejecuta: PetTermux --status init\e[0m" && exit 1
+  source "$DATA"
+  NOMBRE=$(cat "$NAME_FILE" 2>/dev/null || echo "Mascota")
+}
+
+save_data() {
+  echo "happiness=$happiness" > "$DATA"
+  echo "health=$health" >> "$DATA"
+  echo "energy=$energy" >> "$DATA"
+}
+
+init_pet() {
+  echo "happiness=100" > "$DATA"
+  echo "health=100" >> "$DATA"
+  echo "energy=100" >> "$DATA"
+  echo "Mascota" > "$NAME_FILE"
+  ascii_pet
+  echo -e "\e[32m¡Mascota creada con éxito!\e[0m"
+}
+
+show_status() {
+  load_data
+  ascii_pet
+  echo -e "\e[36mEstado de $NOMBRE:\e[0m"
+  echo -e "Felicidad: \e[33m$happiness\e[0m"
+  echo -e "Salud:     \e[33m$health\e[0m"
+  echo -e "Energía:   \e[33m$energy\e[0m"
+}
+
+care_pet() {
+  load_data
+  happiness=$((happiness + 10))
+  health=$((health + 5))
+  energy=$((energy - 10))
+  echo -e "\e[32mCuidaste a $NOMBRE\e[0m"
+  save_data
+  show_status
+}
+
+feed_pet() {
+  load_data
+  energy=$((energy + 20))
+  happiness=$((happiness + 5))
+  echo -e "\e[32mAlimentaste a $NOMBRE\e[0m"
+  save_data
+  show_status
+}
+
+sleep_pet() {
+  load_data
+  energy=$((energy + 30))
+  happiness=$((happiness - 5))
+  echo -e "\e[34m$NOMBRE durmió una siesta...\e[0m"
+  save_data
+  show_status
+}
+
+heal_pet() {
+  load_data
+  health=$((health + 25))
+  happiness=$((happiness - 5))
+  echo -e "\e[92mCuraste a $NOMBRE\e[0m"
+  save_data
+  show_status
+}
+
+rename_pet() {
+  echo -e "\e[33mNuevo nombre para tu mascota:\e[0m"
+  read new_name
+  echo "$new_name" > "$NAME_FILE"
+  echo -e "\e[32m¡Nombre actualizado a $new_name!\e[0m"
+}
+
+jugar() {
+  load_data
+  echo -e "\e[35m$NOMBRE está jugando y se divierte mucho.\e[0m"
+  happiness=$((happiness + 15))
+  energy=$((energy - 15))
+  save_data
+  show_status
+}
+
+reproducir_musica() {
+  echo -e "\e[36mIngresa el link o archivo de música (mp3/mp4/url YouTube):\e[0m"
+  read url
+  mpv "$url"
+}
+
+minijuego_adivina() {
+  numero=$((1 + RANDOM % 10))
+  echo -e "\e[36mAdivina un número entre 1 y 10\e[0m"
+  read intento
+  if [ "$intento" == "$numero" ]; then
+    echo -e "\e[32m¡Correcto! Ganaste.\e[0m"
+  else
+    echo -e "\e[31mIncorrecto. Era $numero.\e[0m"
+  fi
+}
+
+usar_ia() {
+  echo -e "\e[33m¿Qué quieres preguntarle a la IA?\e[0m"
+  read prompt
+  respuesta=$(curl -s "https://nightapioficial.onrender.com/api/gemini?message=$prompt")
+  echo -e "\e[36mRespuesta:\e[0m $respuesta"
+}
+
+juegos_menu() {
+  echo -e "\e[36mMinijuegos disponibles:\e[0m"
+  echo -e "1. Adivina el número => PetTermux --status adivina"
+}
+
+help_menu() {
+  echo -e "\e[36mComandos disponibles:\e[0m"
+  echo -e "--status init        => Crear mascota"
+  echo -e "--status care        => Cuidar"
+  echo -e "--status feed        => Alimentar"
+  echo -e "--status sleep       => Dormir"
+  echo -e "--status heal        => Curar"
+  echo -e "--status jugar       => Jugar"
+  echo -e "--status nombre      => Cambiar nombre"
+  echo -e "--status juegos      => Ver juegos"
+  echo -e "--status musica      => Reproducir música"
+  echo -e "--status ia          => Hablar con IA"
+  echo -e "--status adivina     => Adivina el número"
+  echo -e "--status             => Ver estado"
+}
+
+# Controlador de comandos
+case "$1" in
+  --status)
+    case "$2" in
+      init) init_pet ;;
+      care) care_pet ;;
+      feed) feed_pet ;;
+      sleep) sleep_pet ;;
+      heal) heal_pet ;;
+      jugar) jugar ;;
+      nombre) rename_pet ;;
+      juegos) juegos_menu ;;
+      musica) reproducir_musica ;;
+      ia) usar_ia ;;
+      adivina) minijuego_adivina ;;
+      "" | status) show_status ;;
+      *) echo -e "\e[31mAcción '$2' no reconocida.\e[0m Usa: --status help" ;;
+    esac
+    ;;
+  *) echo -e "\e[31mUso: PetTermux --status [comando]\e[0m. Usa '--status help'" ;;
+esac
+EOF
+
+chmod +x ~/PetTermux/PetTermux.sh
+cp ~/PetTermux/PetTermux.sh $PREFIX/bin/PetTermux
+chmod +x $PREFIX/bin/PetTermux
+
+PetTermux --status init

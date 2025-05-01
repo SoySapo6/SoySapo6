@@ -90,7 +90,7 @@ gemini_api() {
   echo -e "\e[32mRespuesta:\e[0m $response"
 }
 
-# SimSimi Chat
+# SimSimi
 simsimi_api() {
   local message=$(urlencode "$1")
   local lang="${2:-es}"

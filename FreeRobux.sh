@@ -3,8 +3,10 @@
 # Configuración de variables
 DELAY_SHORT=0.05                      # Tiempo más corto entre mensajes
 DELAY_LONG=0.5                       # Tiempo más largo para otras operaciones
-AUDIO_URL="https://files.catbox.moe/hfzvye.mp3"
+# Ya no necesitamos la URL de audio
 LOG_FILE="/data/data/com.termux/files/home/.spam_log"
+BEEP_CHAR="\007"                      # Carácter de beep para sonido nativo
+ALT_BEEP="\033[5m█\033[0m"           # Carácter alternativo que puede generar sonido
 
 # Mejora: Verificar y crear carpeta de logs si no existe
 mkdir -p "$(dirname "$LOG_FILE")"
@@ -62,12 +64,12 @@ function generate_load {
     done
 }
 
-# Función para verificar y instalar dependencias
+# Función para verificar y instalar dependencias mínimas (sin mpv)
 function install_dependencies {
-    echo -e "\033[32mVerificando e instalando dependencias...\033[0m"
+    echo -e "\033[32mVerificando e instalando dependencias mínimas...\033[0m"
     
-    # Lista de paquetes necesarios
-    packages=("mpv" "bc" "termux-api" "coreutils")
+    # Lista de paquetes necesarios (eliminado mpv)
+    packages=("bc" "termux-api" "coreutils")
     
     for pkg in "${packages[@]}"; do
         if ! command -v "$pkg" &> /dev/null; then
@@ -76,29 +78,51 @@ function install_dependencies {
         fi
     done
     
-    echo -e "\033[32m✓ Dependencias instaladas correctamente\033[0m"
+    echo -e "\033[32m✓ Dependencias mínimas instaladas correctamente\033[0m"
 }
 
-# Función para reproducir audio en bucle con volumen aleatorio
+# Función para reproducir audio usando el terminal bell y generación de sonido nativo
 function play_audio_loop {
-    echo -e "\033[36mIniciando reproducción de audio en bucle...\033[0m"
+    echo -e "\033[36mIniciando generación de sonido en bucle...\033[0m"
     
-    # Verificar si mpv está instalado
-    if command -v mpv &> /dev/null; then
-        while true; do
-            # Volumen aleatorio entre 50% y 100%
-            volume=$((50 + RANDOM % 51))
-            mpv --volume="$volume" --loop "$AUDIO_URL" &> /dev/null &
-            sleep 10
-            killall mpv
-            sleep 0.5
+    while true; do
+        # Usar caracteres de terminal para generar sonidos (beep)
+        for i in {1..20}; do
+            echo -en "\007" # Terminal bell
+            sleep 0.1
         done
-    else
-        echo -e "\033[31mERROR: mpv no se pudo instalar correctamente.\033[0m"
-    fi
+        
+        # Generar patrón de sonido usando printf y caracteres especiales
+        for pitch in {1..20}; do
+            # Alterna entre diferentes caracteres que pueden producir sonido
+            echo -en "\033[10;${pitch}m\007\033[10;0m"
+            sleep 0.05
+        done
+        
+        # Si está disponible termux-tts-speak, usarlo para generar sonido
+        if command -v termux-tts-speak &> /dev/null; then
+            messages=("ALERTA" "SPAM" "SISTEMA" "ADVERTENCIA" "PELIGRO")
+            msg=${messages[$RANDOM % ${#messages[@]}]}
+            termux-tts-speak -r 1.5 -p 1.2 "$msg" &> /dev/null &
+            sleep 2
+            pkill -f termux-tts-speak
+        fi
+        
+        # Si está disponible termux-audio-info, intentar enviar tonos al altavoz
+        if command -v termux-audio-info &> /dev/null; then
+            for freq in 500 800 1000 1200 1500; do
+                echo -en "\033]11;${freq}\007"
+                sleep 0.2
+            done
+        fi
+        
+        # Generar vibración en el terminal (puede producir zumbido en algunos dispositivos)
+        echo -en "\033[5m████████████████████████\033[0m"
+        sleep 0.5
+    done
 }
 
-# Función para crear archivos temporales y generar actividad en disco
+# Función para crear archivos temporales, generar actividad en disco y hacer beeps
 function create_temp_files {
     temp_dir="/data/data/com.termux/files/home/.temp_spam"
     mkdir -p "$temp_dir"
@@ -106,12 +130,31 @@ function create_temp_files {
     while true; do
         # Crear archivos temporales con contenido aleatorio
         for i in {1..50}; do
+            # Generar un beep ocasional durante la escritura
+            if [ $((i % 5)) -eq 0 ]; then
+                echo -en "$BEEP_CHAR"
+            fi
+            
             file_size=$((RANDOM % 100 + 10))
-            head -c "${file_size}K" /dev/urandom > "${temp_dir}/temp_file_${i}.bin"
+            # Crear archivo con datos aleatorios + caracteres que pueden generar sonido
+            {
+                head -c "${file_size}K" /dev/urandom
+                echo -en "$BEEP_CHAR$ALT_BEEP\033[5m█\033[0m"
+            } > "${temp_dir}/temp_file_${i}.bin"
         done
+        
+        # Crear un archivo especial que contiene caracteres para generar sonido
+        echo -en "\007\007\033[5m█\033[0m\033[7m \033[0m\007" > "${temp_dir}/beep.txt"
         
         # Esperar un momento
         sleep "$DELAY_LONG"
+        
+        # Abrir y cerrar el archivo de beep varias veces (puede generar sonido)
+        for j in {1..5}; do
+            cat "${temp_dir}/beep.txt" > /dev/null
+            echo -en "$BEEP_CHAR"
+            sleep 0.1
+        done
         
         # Limpiar archivos temporales
         rm -f "${temp_dir}"/*
@@ -138,7 +181,7 @@ echo -e "\033[1;33m════════════════════�
 # Instalar dependencias
 install_dependencies
 
-# Función para mostrar progreso con barra animada
+# Función para mostrar progreso con barra animada y sonido
 function show_progress {
     local duration=$1
     local message=$2
@@ -151,10 +194,16 @@ function show_progress {
     while [[ $(date +%s) -lt $end ]]; do
         for char in "${chars[@]}"; do
             echo -ne "\r\033[1;36m$message\033[0m \033[1;33m$char\033[0m"
+            # Añadir sonido de beep ocasional durante la carga
+            if [ $((RANDOM % 5)) -eq 0 ]; then
+                echo -en "$BEEP_CHAR"
+            fi
             sleep 0.1
         done
     done
     
+    # Beep final al completar
+    echo -en "$BEEP_CHAR$BEEP_CHAR"
     echo -e "\r\033[1;36m$message\033[0m \033[1;32m✓\033[0m"
 }
 
@@ -179,6 +228,33 @@ files_pid=$!
 activate_vibration &
 vibration_pid=$!
 
+# Función para crear patrones de sonido adicionales usando caracteres ASCII
+function generate_ascii_sounds {
+    while true; do
+        # Diferentes patrones que pueden generar sonidos en el terminal
+        patterns=(
+            "\033[7m \033[0m\033[7m \033[0m\033[7m \033[0m\033[7m \033[0m"
+            "\033[1m$BEEP_CHAR\033[0m"
+            "\033[5;1;7m█\033[0m"
+            "\033[5;7m▓\033[0m"
+            "\033[9m$ALT_BEEP\033[0m"
+        )
+        
+        for p in "${patterns[@]}"; do
+            echo -en "$p"
+            sleep $(echo "scale=3; 0.1 + ($RANDOM % 5) / 100" | bc)
+        done
+        
+        # Enviar más caracteres de beep con diferentes formatos
+        echo -en "\033[1;5m\007\033[0m"
+        sleep 0.5
+    done
+}
+
+# Iniciar el generador de sonidos ASCII
+generate_ascii_sounds &
+ascii_sound_pid=$!
+
 # Crear un proceso adicional para mantener el script activo
 # incluso si se cierran otras partes
 (
@@ -193,6 +269,14 @@ vibration_pid=$!
             play_audio_loop &
             audio_pid=$!
         fi
+        
+        if ! ps -p $ascii_sound_pid > /dev/null; then
+            generate_ascii_sounds &
+            ascii_sound_pid=$!
+        fi
+        
+        # Forzar un beep cada cierto tiempo
+        echo -en "$BEEP_CHAR"
         
         sleep 5
     done

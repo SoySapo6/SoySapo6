@@ -5,7 +5,7 @@ function print_colored {
     colors=("31" "32" "33" "34" "35" "36")
     while true; do
         color=${colors[$RANDOM % ${#colors[@]}]}
-        echo -e "\033[${color}m$(date) - ¡Spam colorido!$(date)\033[0m"
+        echo -e "\033[${color}m$(date) - HAHAHA$(date)\033[0m"
         sleep 0.2
     done
 }

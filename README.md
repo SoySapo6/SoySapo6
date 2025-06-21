@@ -45,3 +45,9 @@ Soy un programador apasionado de Perú, con un amor por la vida y la tecnología
 </div>
 
 <img width=100% src="https://capsule-render.vercel.app/api?type=waving&color=FF932E&height=120&section=footer"/>
+
+---
+
+# Doname!
+
+<a href="https://ko-fi.com/soymaycol">![kofi](https://files.catbox.moe/qaimjd.png)</a>

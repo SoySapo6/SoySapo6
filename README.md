@@ -6,7 +6,7 @@
   <h1>¡Hola hola! Soy <strong>Maycol</strong> (⁠◍⁠•⁠ᴗ⁠•⁠◍⁠)⁠❤</h1>
   <p><strong>Desarrollador de Bots, Juegos y Proyectos Mágicos ✨ desde Perú</strong></p>
   <p>Autoexigente, apasionado y con mucho amor por la tecnología 💻💕</p>
-  <a href="https://whatsapp.com/channel/0029VaGutVF84OmEzvMRra20">
+  <a href="https://whatsapp.com/channel/0029VayXJte65yD6LQGiRB0R">
     <img src="https://img.shields.io/badge/Canal_de_SoyMaycol-25D366?style=for-the-badge&logo=whatsapp&logoColor=white"/>
   </a>
 </div>

@@ -6,7 +6,7 @@
 </p> 
 
   <h2>SoyMaycol - GitHub</h2>
-  <p><strong>Hago proyectos relacionados a la programación como Bots o webs y blah blah blah</p>
+  <p><strong>Hago proyectos relacionados a la programación como Bots o webs y eso</p>
   </strong>
  </div>
 
